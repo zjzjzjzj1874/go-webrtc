@@ -1,0 +1,39 @@
+version: '3.8'
+
+# 定义服务，可根据实际需求添加更多服务
+services:
+  go-webrtc-service:
+    # 服务描述，方便理解该服务的用途
+    <<: &service_description
+      description: 主应用服务，提供 WebRTC 相关功能
+    # 替换为您实际使用的 Docker 镜像，建议使用更具描述性的镜像名
+    image: go-webrtc-app:latest
+    # 为容器指定一个更具描述性的名称
+    container_name: go-webrtc-container
+    ports:
+      # 替换为您实际需要暴露的端口
+      - "8080:8080"
+    volumes:
+      # 替换为您实际需要挂载的目录
+      - ./path/on/host:/path/in/container
+    environment:
+      # 从 .env 文件中加载环境变量
+      - <<: *service_description
+      - KEY=VALUE
+    # 健康检查，确保服务正常运行
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    # 资源限制，防止服务占用过多资源
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    # 重启策略
+    restart: unless-stopped
